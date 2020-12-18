@@ -42,11 +42,11 @@ jobs:
           composer create-project laravel/laravel="${{ matrix.laravel }}" testproject
           cd testproject
           composer require laravel/dusk
-          composer require paksuco/dusk-time-travel @dev
+          composer require paksuco/dusk-time-travel dev-master
 
       - name: Install Dusk Components
         run: |
           php artisan dusk:install
 
       - name: Execute tests
-        run: php artisan dusk
+        run: php artisan dusk /vendor/paksuco/dusk-time-travel/tests
