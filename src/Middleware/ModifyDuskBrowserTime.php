@@ -21,6 +21,7 @@ class ModifyDuskBrowserTime
             $time = $_COOKIE["dusk-skip-time"];
             Carbon::setTestNow(new Carbon($time));
         }
+
         return $next($request);
     }
 }
