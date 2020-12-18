@@ -5,15 +5,7 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/paksuco/dusk-time-travel.svg?style=flat-square)](https://packagist.org/packages/paksuco/dusk-time-travel)
 
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
-
-## Support us
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/package-dusk-time-travel-laravel.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/package-dusk-time-travel-laravel)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+This package feeds the hunger for Dusk test cases having time modified requests. All PR's are welcome since it's still not mature enough, and might not work as expected. But I think it's easy to understand what this package does.
 
 ## Installation
 
@@ -23,37 +15,61 @@ You can install the package via composer:
 composer require paksuco/dusk-time-travel
 ```
 
-You can publish and run the migrations with:
+There is a crucial step to do after installing the package to let the browser have time travel methods, you need to extend your browser class from `Paksuco/DuskTimeTravel/Browser` class instead of the stock `Laravel/Dusk/Browser`. This class acts like a middle man between your test cases and the Laravel Dusk browser.
 
-```bash
-php artisan vendor:publish --provider="Paksuco\DuskTimeTravel\DuskTimeTravelServiceProvider" --tag="migrations"
-php artisan migrate
-```
-
-You can publish the config file with:
-```bash
-php artisan vendor:publish --provider="Paksuco\DuskTimeTravel\DuskTimeTravelServiceProvider" --tag="config"
-```
-
-This is the contents of the published config file:
+To do this, add this code to your `DuskTestCase.php` file:
 
 ```php
-return [
-];
+
+    use \Paksuco\DuskTimeTravel\Browser as TimeTravelBrowser;
+
+    class DuskTestCase extends BaseTestCase {
+
+        protected function newBrowser($driver)
+        {
+            return new TimeTravelBrowser($driver);
+        }
+
+    }
 ```
 
 ## Usage
 
+Since you've changed your browser class, you've gained access to two new Dusk browser methods: **travelTo($time)** and **travelBack**. As you can easily understand from the names, first travels through time, uses a `Illuminate/Support/Carbon` instance as the time input, and second brings it back.
+
+**Note**: As it's using cookies to deliver the modified time to the browser, only the next requests will be affected with the changed time, the current page won't be having the date modified.
+
+For example:
+
 ```php
-$dusk-time-travel = new Paksuco\DuskTimeTravel();
-echo $dusk-time-travel->echoPhrase('Hello, Paksuco!');
+// test case
+$this->browse(function ($browser) {
+
+    // on the homepage, you will see today's date as the current date.
+    $browser->visit("home")
+        ->travelTo(Carbon::tomorrow());
+
+    // but, like this, you'll see tomorrows date as the current date
+    $browser->travelTo(Carbon::tomorrow())
+        ->visit("home");
+
+
+    // an example use case, do something in yesterdays date and expect it to see today.
+    $browser->travelTo(Carbon::yesterday())->visit($itemDetailsPage)
+        ->doStuffInYesterdaysDate()
+        ->travelBack()->visit($itemDetailsPage)
+        ->assertSee(Carbon::yesterday());
+});
 ```
+
+Both of them will use tomorrows date as the next request (AJAX or Redirect, doesn't matter).
+
+After you've recreated the instance, or manually reset the date back to current by using **travelBack**, the date server uses will revert to normal.
+<br><br>
+
 
 ## Testing
-
-```bash
-composer test
-```
+A test case is included, but since it's a Dusk extension, the tests are run on a Laravel instance having Dusk installed. You can test the plugin the same way `.github/workflows/run-tests.yml` workflow does.
 
 ## Changelog
 
