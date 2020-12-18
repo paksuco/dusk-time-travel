@@ -1,17 +1,17 @@
 {
-    "name": ":vendor_name/:package_name",
-    "description": ":package_description",
+    "name": "paksuco/dusk-time-travel",
+    "description": "A dusk browser extension package for time traveling",
     "keywords": [
-        ":vendor_name",
-        ":package_name"
+        "paksuco",
+        "dusk-time-travel"
     ],
-    "homepage": "https://github.com/:vendor_name/:package_name",
+    "homepage": "https://github.com/paksuco/dusk-time-travel",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": ":author_email",
-            "homepage": "https://spatie.be",
+            "name": "Taha Paksu",
+            "email": "tpaksu@gmail.com",
+            "homepage": "https://rettica.com",
             "role": "Developer"
         }
     ],
@@ -25,13 +25,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Spatie\\Skeleton\\": "src",
-            "Spatie\\Skeleton\\Database\\Factories\\": "database/factories"
+            "Paksuco\\DuskTimeTravel\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Spatie\\Skeleton\\Tests\\": "tests"
+            "Paksuco\\DuskTimeTravel\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -45,11 +44,8 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Spatie\\Skeleton\\SkeletonServiceProvider"
-            ],
-            "aliases": {
-                "Skeleton": "Spatie\\Skeleton\\SkeletonFacade"
-            }
+                "Paksuco\\DuskTimeTravel\\DuskTimeTravelServiceProvider"
+            ]
         }
     },
     "minimum-stability": "dev",
@@ -57,11 +53,7 @@
     "funding": [
         {
             "type": "github",
-            "url": "https://github.com/sponsors/spatie"
-        },
-        {
-            "type": "other",
-            "url": "https://spatie.be/open-source/support-us"
+            "url": "https://github.com/sponsors/tpaksu"
         }
     ]
 }
