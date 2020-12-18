@@ -9,15 +9,15 @@ jobs:
       fail-fast: true
       matrix:
         php: [7.4, 7.3, 7.2]
-        laravel: [8.*, 7.*, 6.*, 5.8, 5.7]
+        laravel: [8.*, 7.*, 6.*, "5.8.*", "5.7.*"]
         dependency-version: [prefer-lowest, prefer-stable]
         os: [ubuntu-latest]
         exclude:
-            - laravel: 5.7
+            - laravel: 5.7.*
               php: 7.4
-            - laravel: 5.6
+            - laravel: 5.6.*
               php: 7.4
-            - laravel: 5.5
+            - laravel: 5.5.*
               php: 7.4
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
@@ -38,7 +38,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer create-project laravel/laravel --${{ matrix.laravel }} .
+          composer global require laravel/installer
+          composer create-project laravel/laravel="${{ matrix.laravel }}" testproject
+          cd testproject
           composer require laravel/dusk
           composer require paksuco/dusk-time-travel @dev
 
