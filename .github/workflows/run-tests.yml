@@ -17,9 +17,7 @@ jobs:
         exclude:
             - laravel: 5.7.*
               php: 7.4
-            - laravel: 5.6.*
-              php: 7.4
-            - laravel: 5.5.*
+            - laravel: 5.8.*
               php: 7.4
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
@@ -31,6 +29,12 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
           coverage: none
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.composer/cache/files
+          key: dependencies-${{ matrix.dependency-version }}-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
 
       - name: Install dependencies
         run: |
@@ -45,12 +49,6 @@ jobs:
           cd ~/testproject
           php artisan dusk:install
 
-      - name: Cache dependencies
-        uses: actions/cache@v1
-        with:
-          path: ~/.composer/cache/files
-          key: dependencies-${{ matrix.dependency-version }}-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
-
       - name: Install package
         run: |
           cd ~/testproject
@@ -59,4 +57,4 @@ jobs:
       - name: Execute tests
         run: |
           cd ~/testproject
-          php artisan dusk /vendor/paksuco/dusk-time-travel/tests
+          php artisan dusk /vendor/paksuco/dusk-time-travel/tests/Browser/ExtensionTest.php
