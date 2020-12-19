@@ -1,47 +1,62 @@
-name: tests
+name: Tests
 
-on:
-  push:
-  pull_request:
+on: [push, pull_request]
 
 jobs:
-  tests:
-    runs-on: ubuntu-latest
-
+  test:
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
       matrix:
-        php: [7.2, 7.3, 7.4, 8.0]
-        laravel: [^6.0, ^7.0, ^8.0]
-        phpunit: [^7.5, ^8.4, ^9.0]
+        #php: [7.4, 7.3, 7.2]
+        php: [7.4]
+        #laravel: [8.*, 7.*, 6.*, "5.8.*", "5.7.*"]
+        laravel: [8.*]
+        dependency-version: [prefer-stable]
+        os: [ubuntu-latest]
         exclude:
-          - php: 7.2
-            phpunit: ^9.0
-          - php: 7.2
-            laravel: ^8.0
-          - php: 8.0
-            phpunit: ^7.5
-          - php: 8.0
-            phpunit: ^8.4
+            - laravel: 5.7.*
+              php: 7.4
+            - laravel: 5.8.*
+              php: 7.4
 
-    name: P${{ matrix.php }} - L${{ matrix.laravel }} - U${{ matrix.phpunit }}
+    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.os }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip
-          tools: composer:v2
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
           coverage: none
+        env:
+          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install dependencies
         run: |
-           composer require "illuminate/contracts:${{ matrix.laravel }}" "phpunit/phpunit:${{ matrix.phpunit }}" "paksuco/dusk-time-travel:dev-master" --dev --no-update
-           composer update --prefer-dist --no-interaction --no-progress
+          composer global require laravel/installer
+          cd ~
+          composer create-project laravel/laravel="${{ matrix.laravel }}" testproject
+          cd ~/testproject
+          composer require laravel/dusk
 
-      - name: Execute tests
-        run: vendor/bin/phpunit --verbose
+      - name: Install Dusk Components
+        run: |
+          cd ~/testproject
+          php artisan dusk:install
+
+      - name: Install package
+        run: |
+          cd ~/testproject
+          composer require paksuco/dusk-time-travel:dev-master --prefer-source
+          composer dumpautoload
+
+      - name: Start Dusk
+        env:
+          APP_URL: "http://127.0.0.1:8000"
+        run: |
+          cd ~/testproject
+          php artisan dusk:chrome-driver
+          ./vendor/laravel/dusk/bin/chromedriver-linux > /dev/null 2>&1 &
+          php artisan serve > /dev/null 2>&1 &
+          php artisan dusk
