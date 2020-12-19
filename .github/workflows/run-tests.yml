@@ -29,6 +29,8 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
           coverage: none
+        env:
+          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install dependencies
         run: |
@@ -46,9 +48,10 @@ jobs:
       - name: Install package
         run: |
           cd ~/testproject
-          composer require paksuco/dusk-time-travel --prefer-source
+          composer require paksuco/dusk-time-travel:dev-master --prefer-source
+          composer dumpautoload
 
       - name: Execute tests
         run: |
           cd ~/testproject
-          php artisan dusk ~/testproject/vendor/paksuco/dusk-time-travel/tests/Browser/ExtensionTest.php
+          php artisan dusk # ~/testproject/vendor/paksuco/dusk-time-travel/tests/Browser/ExtensionTest.php
