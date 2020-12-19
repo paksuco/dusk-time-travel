@@ -12,7 +12,7 @@ jobs:
         php: [7.4]
         #laravel: [8.*, 7.*, 6.*, "5.8.*", "5.7.*"]
         laravel: [8.*]
-        dependency-version: [prefer-lowest, prefer-stable]
+        dependency-version: [prefer-stable]
         os: [ubuntu-latest]
         exclude:
             - laravel: 5.7.*
@@ -46,7 +46,7 @@ jobs:
       - name: Install package
         run: |
           cd ~/testproject
-          composer require paksuco/dusk-time-travel
+          composer require paksuco/dusk-time-travel --prefer-source
 
       - name: Execute tests
         run: |
