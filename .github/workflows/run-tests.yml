@@ -51,19 +51,10 @@ jobs:
           composer require paksuco/dusk-time-travel:dev-master --prefer-source
           composer dumpautoload
 
-      - name: Upgrade Chrome Driver
+      - name: Start Dusk
         run: |
           cd ~/testproject
           php artisan dusk:chrome-driver
-
-      - name: Start Chrome Driver
-        run: |
-          cd ~/testproject
           ./vendor/laravel/dusk/bin/chromedriver-linux > /dev/null 2>&1 &
-
-      - name: Execute tests
-        run: |
-          cd ~/testproject
           php artisan serve > /dev/null 2>&1 &
-          chmod -R 0755 vendor/laravel/dusk/bin/
-          php artisan dusk # ~/testproject/vendor/paksuco/dusk-time-travel/tests/Browser/ExtensionTest.php
+          php artisan dusk
