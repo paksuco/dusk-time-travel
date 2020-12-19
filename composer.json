@@ -21,11 +21,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Paksuco\\DuskTimeTravel\\": "src"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
+            "Paksuco\\DuskTimeTravel\\": "src",
             "Paksuco\\DuskTimeTravel\\Tests\\": "tests"
         }
     },
