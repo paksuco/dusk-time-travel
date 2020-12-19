@@ -57,4 +57,4 @@ jobs:
       - name: Execute tests
         run: |
           cd ~/testproject
-          php artisan dusk vendor/paksuco/dusk-time-travel/tests/Browser/ExtensionTest.php
+          php artisan dusk ~/testproject/vendor/paksuco/dusk-time-travel/tests/Browser/ExtensionTest.php
