@@ -32,19 +32,22 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
           coverage: none
 
-      - name: Cache dependencies
-        uses: actions/cache@v1
-        with:
-          path: ~/.composer/cache/files
-          key: dependencies-${{ matrix.dependency-version }}-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
-
       - name: Install dependencies
         run: |
           composer global require laravel/installer
           composer create-project laravel/laravel="${{ matrix.laravel }}" testproject
           cd testproject
           composer require laravel/dusk
-          composer require paksuco/dusk-time-travel:dev-master
+
+      - name: Cache dependencies
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache/files
+          key: dependencies-${{ matrix.dependency-version }}-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
+
+      - name: Install package
+        run: |
+          composer require paksuco/dusk-time-travel
 
       - name: Install Dusk Components
         run: |
