@@ -39,8 +39,6 @@ jobs:
           key: dependencies-${{ matrix.dependency-version }}-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
 
       - name: Install dependencies
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
         run: |
           composer global require laravel/installer
           composer create-project laravel/laravel="${{ matrix.laravel }}" testproject
