@@ -35,9 +35,15 @@ jobs:
       - name: Install dependencies
         run: |
           composer global require laravel/installer
+          cd ~
           composer create-project laravel/laravel="${{ matrix.laravel }}" testproject
-          cd testproject
+          cd ~/testproject
           composer require laravel/dusk
+
+      - name: Install Dusk Components
+        run: |
+          cd ~/testproject
+          php artisan dusk:install
 
       - name: Cache dependencies
         uses: actions/cache@v1
@@ -47,11 +53,10 @@ jobs:
 
       - name: Install package
         run: |
+          cd ~/testproject
           composer require paksuco/dusk-time-travel
 
-      - name: Install Dusk Components
-        run: |
-          php artisan dusk:install
-
       - name: Execute tests
-        run: php artisan dusk /vendor/paksuco/dusk-time-travel/tests
+        run: |
+          cd ~/testproject
+          php artisan dusk /vendor/paksuco/dusk-time-travel/tests
