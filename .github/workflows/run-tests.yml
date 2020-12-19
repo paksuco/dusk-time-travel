@@ -52,10 +52,14 @@ jobs:
           composer dumpautoload
 
       - name: Upgrade Chrome Driver
-        run: php artisan dusk:chrome-driver
+        run: |
+          cd ~/testproject
+          php artisan dusk:chrome-driver
 
       - name: Start Chrome Driver
-        run: ./vendor/laravel/dusk/bin/chromedriver-linux > /dev/null 2>&1 &
+        run: |
+          cd ~/testproject
+          ./vendor/laravel/dusk/bin/chromedriver-linux > /dev/null 2>&1 &
 
       - name: Execute tests
         run: |
