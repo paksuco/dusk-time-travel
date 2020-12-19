@@ -59,4 +59,4 @@ jobs:
           php artisan dusk:chrome-driver
           ./vendor/laravel/dusk/bin/chromedriver-linux > /dev/null 2>&1 &
           php artisan serve > /dev/null 2>&1 &
-          php artisan dusk
+          php artisan dusk ~/testproject/vendor/paksuco/dusk-time-travel/tests/Browser/*
