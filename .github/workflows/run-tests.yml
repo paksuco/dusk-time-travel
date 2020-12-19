@@ -8,8 +8,10 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [7.4, 7.3, 7.2]
-        laravel: [8.*, 7.*, 6.*, "5.8.*", "5.7.*"]
+        #php: [7.4, 7.3, 7.2]
+        php: [7.4]
+        #laravel: [8.*, 7.*, 6.*, "5.8.*", "5.7.*"]
+        laravel: [8.*]
         dependency-version: [prefer-lowest, prefer-stable]
         os: [ubuntu-latest]
         exclude:
@@ -42,7 +44,7 @@ jobs:
           composer create-project laravel/laravel="${{ matrix.laravel }}" testproject
           cd testproject
           composer require laravel/dusk
-          composer require paksuco/dusk-time-travel dev-master
+          composer require paksuco/dusk-time-travel:dev-master
 
       - name: Install Dusk Components
         run: |
