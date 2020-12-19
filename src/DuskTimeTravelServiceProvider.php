@@ -2,16 +2,15 @@
 
 namespace Paksuco\DuskTimeTravel;
 
+use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Paksuco\DuskTimeTravel\Middleware\ModifyDuskBrowserTime;
 
 class DuskTimeTravelServiceProvider extends ServiceProvider
 {
-    public function boot()
+    public function boot(Router $router, Kernel $kernel)
     {
-        /** @var Router $router */
-        $router = app("router");
         $router->pushMiddlewareToGroup("web", ModifyDuskBrowserTime::class);
     }
 }

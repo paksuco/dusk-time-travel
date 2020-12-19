@@ -2,61 +2,38 @@
 
 namespace Paksuco\DuskTimeTravel\Tests;
 
-use Facebook\WebDriver\Chrome\ChromeOptions;
-use Facebook\WebDriver\Remote\DesiredCapabilities;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
-use Laravel\Dusk\TestCase as BaseTestCase;
+use Orchestra\Testbench\Dusk\TestCase as BaseTestCase;
 use Paksuco\DuskTimeTravel\Browser as TimeTravelEnabledBrowser;
+use Paksuco\DuskTimeTravel\DuskTimeTravelServiceProvider;
+use Paksuco\DuskTimeTravel\Middleware\ModifyDuskBrowserTime;
 
 abstract class DuskTestCase extends BaseTestCase
 {
-    use CreatesApplication;
+    protected static $baseServeHost = 'localhost';
+    protected static $baseServePort = 9516;
 
     /**
-     * Prepare for Dusk test execution.
+     * Create a new Browser instance.
      *
-     * @beforeClass
-     * @return void
+     * @param  \Facebook\WebDriver\Remote\RemoteWebDriver  $driver
+     * @return \Laravel\Dusk\Browser
      */
-    public static function prepare()
-    {
-        if (! static::runningInSail()) {
-            static::startChromeDriver();
-        }
-    }
-
     protected function newBrowser($driver)
     {
         return new TimeTravelEnabledBrowser($driver);
     }
 
-    protected function setUp(): void
+    protected function getPackageProviders($app)
     {
-        parent::setUp();
+        return [
+            DuskTimeTravelServiceProvider::class
+        ];
     }
 
-    /**
-     * Create the RemoteWebDriver instance.
-     *
-     * @return \Facebook\WebDriver\Remote\RemoteWebDriver
-     */
-    protected function driver()
+    protected function getEnvironmentSetUp($app)
     {
-        $browserCapabilities = DesiredCapabilities::chrome();
-        $optionsBase = new ChromeOptions;
+        $kernel = app('Illuminate\Contracts\Http\Kernel');
 
-        $options = $optionsBase->addArguments([
-            '--disable-gpu',
-            '--headless',
-            '--no-sandbox',
-            '--window-size=1920,1080',
-        ]);
-
-        return RemoteWebDriver::create(
-            $_ENV['DUSK_DRIVER_URL'] ?? 'http://localhost:9515',
-            $browserCapabilities
-                ->setCapability(ChromeOptions::CAPABILITY, $options)
-                ->setCapability('acceptInsecureCerts', true)
-        );
+        $kernel->pushMiddleware(ModifyDuskBrowserTime::class);
     }
 }

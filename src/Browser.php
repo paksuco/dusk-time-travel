@@ -16,7 +16,7 @@ class Browser extends DuskBrowser
      */
     public function travelTo(Carbon $time)
     {
-        return tap($this, function ($browser) use ($time) {
+        return tap($this, function (DuskBrowser $browser) use ($time) {
             $browser->plainCookie("dusk-skip-time", $time->toIso8601String());
         });
     }
@@ -28,7 +28,7 @@ class Browser extends DuskBrowser
      */
     public function travelBack()
     {
-        return tap($this, function ($browser) {
+        return tap($this, function (DuskBrowser $browser) {
             $browser->deleteCookie("dusk-skip-time");
         });
     }

@@ -5,6 +5,8 @@ namespace Paksuco\DuskTimeTravel\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Session;
 
 class ModifyDuskBrowserTime
 {
@@ -16,9 +18,9 @@ class ModifyDuskBrowserTime
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
-    {
-        if (isset($_COOKIE["dusk-skip-time"])) {
-            $time = $_COOKIE["dusk-skip-time"];
+    {;
+        if (Cookie::has("dusk-skip-time")) {
+            $time = Cookie::get("dusk-skip-time");
             Carbon::setTestNow(new Carbon($time));
         }
 

@@ -3,34 +3,59 @@
 namespace Paksuco\DuskTimeTravel\Tests\Browser;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Route;
 use Paksuco\DuskTimeTravel\Browser;
 use Paksuco\DuskTimeTravel\Tests\DuskTestCase;
 
 class ExtensionTest extends DuskTestCase
 {
-    /** @test */
-    public function testTimeTravelWorking()
+    /**
+     * Define environment setup.
+     *
+     * @param  Illuminate\Foundation\Application  $app
+     *
+     * @return void
+     */
+    protected function defineEnvironment($app)
     {
-        $this->mockViewRoutes();
+        $app['router']->get(
+            'time', [
+                'middleware' => 'web',
+                'uses' => function () {
+                    return Carbon::now()->startOfHour()->toIso8601String();
+                },
+            ]
+        );
+    }
 
+    public function testTimeRouteWorking()
+    {
         $this->browse(function (Browser $browser) {
             $browser
-                ->visitRoute("paksuco/time/travel")
-                ->assertSee(Carbon::now()->startOfHour()->toIso8601String())
-                ->travelTo(Carbon::yesterday()->setHour(4))
-                ->refresh()
-                ->assertSee(Carbon::yesterday()->setHour(4)->startOfHour()->toIso8601String())
-                ->travelBack()
-                ->refresh()
+                ->visit("/time")
                 ->assertSee(Carbon::now()->startOfHour()->toIso8601String());
         });
     }
 
-    private function mockViewRoutes()
+    /** @test */
+    public function testTimeTravelWorking()
     {
-        Route::get('paksuco/time/travel', function () {
-            echo Carbon::now()->startOfHour()->toIso8601String();
+        $this->browse(function (Browser $browser) {
+            $browser->travelTo(Carbon::yesterday()->setHour(4))
+                ->visit("/time")
+                ->assertSee(Carbon::yesterday()->setHour(4)->startOfHour()->toIso8601String());
+        });
+    }
+
+    public function testTimeTravelResetWorking()
+    {
+        $this->browse(function (Browser $browser) {
+            $browser->travelTo(Carbon::yesterday()->setHour(4))
+                ->visit("/time")
+                ->assertSee(Carbon::yesterday()->setHour(4)->startOfHour()->toIso8601String());
+
+            $browser->travelBack()
+                ->visit("/time")
+                ->assertSee(Carbon::now()->startOfHour()->toIso8601String());
         });
     }
 }
