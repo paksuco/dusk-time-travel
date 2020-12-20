@@ -8,8 +8,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        php: [8.0, 7.4]
+        os: [ubuntu-latest, windows-latest]
+        php: [8.0, 7.4, 7.3]
         laravel: [8.*]
         testbench: [6.*]
         stability: [prefer-stable]
@@ -36,7 +36,7 @@ jobs:
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
-          vendor/bin/dusk-updater detect --auto-update
+          vendor/bin/dusk-updater update
 
       - name: Execute tests
         run: vendor/bin/phpunit --verbose
