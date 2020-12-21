@@ -1,7 +1,7 @@
 # A dusk browser extension package for time traveling
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/paksuco/dusk-time-travel.svg?style=flat-square)](https://packagist.org/packages/paksuco/dusk-time-travel)
-[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/paksuco/dusk-time-travel/run-tests?label=tests)](https://github.com/paksuco/dusk-time-travel/actions?query=workflow%3ATests+branch%3Amaster)
+![Tests](https://github.com/paksuco/dusk-time-travel/workflows/Tests/badge.svg?branch=0.0.1)
 [![Total Downloads](https://img.shields.io/packagist/dt/paksuco/dusk-time-travel.svg?style=flat-square)](https://packagist.org/packages/paksuco/dusk-time-travel)
 
 
