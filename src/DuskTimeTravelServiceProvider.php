@@ -9,6 +9,9 @@ use Paksuco\DuskTimeTravel\Middleware\ModifyDuskBrowserTime;
 
 class DuskTimeTravelServiceProvider extends ServiceProvider
 {
+    /**
+     * @return void
+     */
     public function boot(Router $router, Kernel $kernel)
     {
         $router->prependMiddlewareToGroup("web", ModifyDuskBrowserTime::class);

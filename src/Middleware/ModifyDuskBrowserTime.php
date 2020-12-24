@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Str;
 
 class ModifyDuskBrowserTime
 {
@@ -20,8 +21,12 @@ class ModifyDuskBrowserTime
     {
         ;
         if (Cookie::has("dusk-skip-time")) {
+            /** @var string */
             $time = Cookie::get("dusk-skip-time");
-            Carbon::setTestNow(new Carbon($time));
+            $parsed = Carbon::parse($time);
+            if ($parsed->isValid()) {
+                Carbon::setTestNow($parsed->toIso8601String());
+            }
         }
 
         return $next($request);
