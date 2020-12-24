@@ -6,19 +6,19 @@ jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         os: [ubuntu-latest]
-        php: [7.3, 8.0, 7.4]
+        php: [7.4, 8.0]
         laravel: [8.*, 7.*]
-        stability: [prefer-stable, prefer-lowest]
+        dependency-version: [prefer-lowest, prefer-stable]
         include:
           - laravel: 8.*
             testbench: 6.*
           - laravel: 7.*
             testbench: 5.*
 
-    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
+    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
 
     steps:
       - name: Checkout code
@@ -41,7 +41,7 @@ jobs:
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench-dusk:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
-          vendor/bin/dusk-updater update
+          ./vendor/bin/dusk-updater update
 
       - name: Execute tests
-        run: vendor/bin/phpunit
+        run: php artisan dusk
