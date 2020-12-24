@@ -8,31 +8,13 @@ use Paksuco\DuskTimeTravel\Tests\DuskTestCase;
 
 class ExtensionTest extends DuskTestCase
 {
-    /**
-     * Define environment setup.
-     *
-     * @param  Illuminate\Foundation\Application  $app
-     *
-     * @return void
-     */
-    protected function defineEnvironment($app)
-    {
-        $app['router']->get(
-            'time',
-            [
-                'middleware' => 'web',
-                'uses' => function () {
-                    return Carbon::now()->startOfHour()->toIso8601String();
-                },
-            ]
-        );
-    }
-
+    /** @test */
     public function testTimeRouteWorking()
     {
         $this->browse(function (Browser $browser) {
             $browser
                 ->visit("/time")
+                ->screenshot("check_route")
                 ->assertSee(Carbon::now()->startOfHour()->toIso8601String());
         });
     }

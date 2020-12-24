@@ -2,6 +2,7 @@
 
 namespace Paksuco\DuskTimeTravel\Tests;
 
+use Illuminate\Support\Carbon;
 use Orchestra\Testbench\Dusk\TestCase as BaseTestCase;
 use Paksuco\DuskTimeTravel\Browser as TimeTravelEnabledBrowser;
 use Paksuco\DuskTimeTravel\DuskTimeTravelServiceProvider;
@@ -32,8 +33,30 @@ abstract class DuskTestCase extends BaseTestCase
 
     protected function getEnvironmentSetUp($app)
     {
-        $kernel = app('Illuminate\Contracts\Http\Kernel');
+        $this->pushMiddleware();
+        $this->registerTestRoute($app);
+    }
 
+    protected function pushMiddleware()
+    {
+        $kernel = $this->getKernel();
         $kernel->pushMiddleware(ModifyDuskBrowserTime::class);
+    }
+
+    protected function getKernel()
+    {
+        return app('Illuminate\Contracts\Http\Kernel');
+    }
+
+    protected function registerTestRoute($app)
+    {
+        $router = $app["router"];
+
+        $router->get('time', [
+            'middleware' => 'web',
+            'uses' => function () {
+                return Carbon::now()->startOfHour()->toIso8601String();
+            },
+        ]);
     }
 }
