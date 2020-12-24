@@ -18,7 +18,8 @@ class ExtensionTest extends DuskTestCase
     protected function defineEnvironment($app)
     {
         $app['router']->get(
-            'time', [
+            'time',
+            [
                 'middleware' => 'web',
                 'uses' => function () {
                     return Carbon::now()->startOfHour()->toIso8601String();

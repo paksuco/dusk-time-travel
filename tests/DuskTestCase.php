@@ -26,7 +26,7 @@ abstract class DuskTestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [
-            DuskTimeTravelServiceProvider::class
+            DuskTimeTravelServiceProvider::class,
         ];
     }
 
