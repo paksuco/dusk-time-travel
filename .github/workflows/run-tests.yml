@@ -44,4 +44,4 @@ jobs:
           ./vendor/bin/dusk-updater update
 
       - name: Execute tests
-        run: php artisan dusk
+        run: ./vendor/bin/phpunit
