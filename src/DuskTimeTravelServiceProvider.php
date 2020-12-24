@@ -11,6 +11,6 @@ class DuskTimeTravelServiceProvider extends ServiceProvider
 {
     public function boot(Router $router, Kernel $kernel)
     {
-        $router->pushMiddlewareToGroup("web", ModifyDuskBrowserTime::class);
+        $router->prependMiddlewareToGroup("web", ModifyDuskBrowserTime::class);
     }
 }
