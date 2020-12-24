@@ -44,4 +44,4 @@ jobs:
           ./vendor/bin/dusk-updater update
 
       - name: Execute tests
-        run: ./vendor/bin/phpunit
+        run: ./vendor/bin/phpunit --verbose
