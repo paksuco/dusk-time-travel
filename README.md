@@ -1,4 +1,8 @@
-# A dusk browser extension package for time traveling
+<div style="margin: 50px 0; text-align: center;"><img src=".github/dusk-time-travel.png"><br><br>
+
+## A dusk browser extension package for time traveling
+
+</div>
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/paksuco/dusk-time-travel.svg?style=flat-square)](https://packagist.org/packages/paksuco/dusk-time-travel)
 ![Tests](https://github.com/paksuco/dusk-time-travel/workflows/Tests/badge.svg?branch=0.0.1)
