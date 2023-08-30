@@ -13,10 +13,6 @@ $finder = Symfony\Component\Finder\Finder::create()
     ->ignoreDotFiles(true)
     ->ignoreVCS(true);
 
-// Updated for PHP CS Fixer v3 compatibility:
-// - Changed Config::create() to new Config() (static create() was removed in v3)
-// - Changed 'trailing_comma_in_multiline_array' to 'trailing_comma_in_multiline' (renamed in v3)
-// - Changed 'class_attributes_separation' elements format from array to associative array with spacing values
 return (new PhpCsFixer\Config())
     ->setRules([
         '@PSR2' => true,
