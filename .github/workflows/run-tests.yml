@@ -71,4 +71,4 @@ jobs:
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
 
       - name: Execute Dusk Tests
-        run: php artisan dusk --without-test-updater --debug
+        run: ./vendor/bin/phpunit --verbose
