@@ -2,6 +2,9 @@ name: Tests
 
 on: [push, pull_request]
 
+env:
+  DUSK_DRIVER_MANAGEMENT: false
+
 jobs:
   test:
     runs-on: ${{ matrix.os }}
@@ -52,6 +55,11 @@ jobs:
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench-dusk:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
+
+      - name: Install Chrome & Chromedriver
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable chromedriver
 
       - name: Execute tests
         run: ./vendor/bin/phpunit --verbose
