@@ -21,14 +21,25 @@ jobs:
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
 
     steps:
+      # Upgraded to actions/checkout@v3 for security improvements and latest features
+      # fetch-depth: 0 ensures full git history is available for any actions that may require it
+      # persist-credentials: false is a recommended security best-practice
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Cache dependencies
-        uses: actions/cache@v1
+        uses: actions/checkout@v3
         with:
-          path: ~/.composer/cache/files
-          key: dependencies-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      # Upgraded to actions/cache@v3 for improved caching performance and security
+      # Changed path to ~/.cache/composer (Composer v2 default) for faster and more reliable caching
+      # Changed key to use composer.lock instead of composer.json to better reflect installed versions
+      # Added restore-keys for fallback cache matching when exact key is not found
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/composer
+          key: dependencies-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: dependencies-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
