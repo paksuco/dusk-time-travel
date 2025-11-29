@@ -5,11 +5,17 @@
 </div>
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/paksuco/dusk-time-travel.svg?style=flat-square)](https://packagist.org/packages/paksuco/dusk-time-travel)
-![Tests](https://github.com/paksuco/dusk-time-travel/workflows/Tests/badge.svg?branch=0.0.1)
 [![Total Downloads](https://img.shields.io/packagist/dt/paksuco/dusk-time-travel.svg?style=flat-square)](https://packagist.org/packages/paksuco/dusk-time-travel)
 
 
 This package feeds the hunger for Dusk test cases having time modified requests. All PR's are welcome since it's still not mature enough, and might not work as expected. But I think it's easy to understand what this package does.
+
+Supported versions:
+- Laravel Dusk 6 → 8
+- Laravel Framework 7 → 12
+- PHP 7.4 and 8.x
+
+Beyond this the package may continue to work, but is untested. Please raise an issue if you encounter a version that is not compatible.
 
 ## Installation
 

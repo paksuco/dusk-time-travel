@@ -1,41 +1,37 @@
 name: Psalm
 
 on:
-    push:
-        paths:
-            - '**.php'
-            - 'psalm.xml'
+  push:
+    paths:
+      - '**.php'
+      - 'psalm.xml'
 
 jobs:
-    psalm:
-        name: psalm
-        runs-on: ubuntu-latest
-        steps:
-            # Upgraded to actions/checkout@v3 for security improvements and latest features
-            # fetch-depth: 0 ensures full git history is available for any actions that may require it
-            - uses: actions/checkout@v3
-              with:
-                  fetch-depth: 0
+  psalm:
+    name: psalm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-            - name: Setup PHP
-              uses: shivammathur/setup-php@v2
-              with:
-                  php-version: '7.4'
-                  extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
-                  coverage: none
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
+          coverage: none
 
-            # Upgraded to actions/cache@v3 for improved caching performance and security
-            # Changed path to ~/.cache/composer (Composer v2 default) for faster and more reliable caching
-            # Added restore-keys for fallback cache matching when exact key is not found
-            - name: Cache composer dependencies
-              uses: actions/cache@v3
-              with:
-                  path: ~/.cache/composer
-                  key: composer-${{ runner.OS }}-composer-${{ hashFiles('composer.lock') }}
-                  restore-keys: composer-${{ runner.OS }}-composer-
+      - name: Cache composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ runner.OS }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.OS }}-composer-
 
-            - name: Run composer install
-              run: composer install -n --prefer-dist
+      - name: Run composer install
+        run: composer install -n --prefer-dist
 
-            - name: Run psalm
-              run: ./vendor/bin/psalm -c psalm.xml
+      - name: Run psalm
+        run: ./vendor/bin/psalm -c psalm.xml

@@ -3,33 +3,40 @@ name: Check & fix styling
 on: [push]
 
 jobs:
-    style:
-        runs-on: ubuntu-latest
+  style:
+    runs-on: ubuntu-latest
 
-        steps:
-            # Upgraded to actions/checkout@v3 for security improvements and latest features
-            # fetch-depth: 0 ensures full git history is available for any actions that may require it
-            -   name: Checkout code
-                uses: actions/checkout@v3
-                with:
-                    fetch-depth: 0
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-            # Updated config path to .php-cs-fixer.dist.php (new naming convention for PHP CS Fixer v3)
-            -   name: Fix style
-                uses: docker://oskarstark/php-cs-fixer-ga
-                with:
-                    args: --config=.php-cs-fixer.dist.php --allow-risky=yes
+      - name: Setup PHP 7.4 (minimum supported version)
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
+          coverage: none
 
-            -   name: Extract branch name
-                shell: bash
-                run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
-                id: extract_branch
+      - name: Install php-cs-fixer (global via Composer)
+        run: composer global require friendsofphp/php-cs-fixer --no-progress --no-interaction --prefer-dist
 
-            # Upgraded to stefanzweifel/git-auto-commit-action@v5 for latest features and security fixes
-            -   name: Commit changes
-                uses: stefanzweifel/git-auto-commit-action@v5
-                with:
-                    commit_message: Fix styling
-                    branch: ${{ steps.extract_branch.outputs.branch }}
-                env:
-                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Add Composer global bin to PATH
+        run: echo "${HOME}/.config/composer/vendor/bin" >> $GITHUB_PATH
+
+      - name: Fix style
+        run: php-cs-fixer fix
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+        id: extract_branch
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Fix styling
+          branch: ${{ steps.extract_branch.outputs.branch }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
