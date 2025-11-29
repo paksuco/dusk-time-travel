@@ -26,9 +26,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          persist-credentials: false
 
       - name: Cache dependencies
         uses: actions/cache@v3
@@ -44,30 +41,34 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
           coverage: none
 
-      # -----------------------------
-      # Install Chrome + Chromedriver
-      # -----------------------------
-      - name: Install Chrome
-        uses: browser-actions/setup-chrome@v1
+      # --------------------------------------------------------------
+      # Install Chrome manually (works on Ubuntu 24.04)
+      # --------------------------------------------------------------
+      - name: Install Google Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget gnupg
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/google.gpg
+          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google.gpg] http://dl.google.com/linux/chrome/deb/ stable main" \
+            | sudo tee /etc/apt/sources.list.d/google-chrome.list
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
 
+      # --------------------------------------------------------------
+      # Install matching Chromedriver (nanasess still works on Noble)
+      # --------------------------------------------------------------
       - name: Install Chromedriver
-        uses: browser-actions/setup-chromedriver@v1
+        uses: nanasess/setup-chromedriver@v2
 
       - name: Start Chromedriver
         run: |
           chromedriver --port=9515 &
           sleep 2
 
-      # -----------------------------
-      # Composer install
-      # -----------------------------
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench-dusk:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
 
-      # -----------------------------
-      # Run Dusk tests
-      # -----------------------------
-      - name: Execute tests
+      - name: Execute Dusk Tests
         run: php artisan dusk --without-test-updater --debug
