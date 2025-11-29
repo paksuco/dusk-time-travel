@@ -24,19 +24,12 @@ jobs:
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
 
     steps:
-      # Upgraded to actions/checkout@v3 for security improvements and latest features
-      # fetch-depth: 0 ensures full git history is available for any actions that may require it
-      # persist-credentials: false is a recommended security best-practice
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
           persist-credentials: false
 
-      # Upgraded to actions/cache@v3 for improved caching performance and security
-      # Changed path to ~/.cache/composer (Composer v2 default) for faster and more reliable caching
-      # Changed key to use composer.lock instead of composer.json to better reflect installed versions
-      # Added restore-keys for fallback cache matching when exact key is not found
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
@@ -51,13 +44,30 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
           coverage: none
 
+      # -----------------------------
+      # Install Chrome + Chromedriver
+      # -----------------------------
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Install Chromedriver
+        uses: browser-actions/setup-chromedriver@v1
+
+      - name: Start Chromedriver
+        run: |
+          chromedriver --port=9515 &
+          sleep 2
+
+      # -----------------------------
+      # Composer install
+      # -----------------------------
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench-dusk:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
 
-      - name: Set up Chromedriver
-        uses: nanasess/setup-chromedriver@v2
-
+      # -----------------------------
+      # Run Dusk tests
+      # -----------------------------
       - name: Execute tests
-        run: ./vendor/bin/phpunit --verbose
+        run: php artisan dusk --without-test-updater --debug
