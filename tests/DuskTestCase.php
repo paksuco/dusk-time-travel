@@ -58,5 +58,30 @@ abstract class DuskTestCase extends BaseTestCase
                 return Carbon::now()->startOfHour()->toIso8601String();
             },
         ]);
+
+        $router->get('js-time', [
+            'middleware' => 'web',
+            'uses' => function () {
+                // The inline script runs at document parse time, before any
+                // post-load injection could execute, so these values prove
+                // the Page.addScriptToEvaluateOnNewDocument path.
+                return '
+                <html>
+                    <body>
+                        <div id="js-iso"></div>
+                        <div id="js-now"></div>
+                        <div id="js-fn"></div>
+                        <div id="js-explicit"></div>
+                        <script>
+                            document.getElementById("js-iso").textContent = new Date().toISOString();
+                            document.getElementById("js-now").textContent = String(Date.now());
+                            document.getElementById("js-fn").textContent = Date();
+                            document.getElementById("js-explicit").textContent = new Date(2020, 0, 1, 12).toISOString();
+                        </script>
+                        <div id="server-time">' . Carbon::now()->toIso8601String() . '</div>
+                    </body>
+                </html>';
+            },
+        ]);
     }
 }
