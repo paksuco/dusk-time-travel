@@ -12,7 +12,7 @@ This package feeds the hunger for Dusk test cases having time modified requests.
 
 Supported versions:
 - Laravel Dusk 6 → 8
-- Laravel Framework 7 → 12
+- Laravel Framework 7 → 13
 - PHP 7.4 → 8.5
 
 Beyond this the package may continue to work, but is untested. Please raise an issue if you run into problems, so it can be fixed.
@@ -49,7 +49,7 @@ Since you've changed your browser class, you've gained access to two new Dusk br
 - `travelTo($time)` - travel through time, using a `Illuminate/Support/Carbon` instance as the time input.
 - `travelBack()` - return to the current time.
 
-**Note**: As the package uses cookies to deliver the modified time to the browser, only the next requests will use the changed time, the current page won't have the date modified. For logging in, this means that may need to change the time and _then_ load the login page.
+**Note**: As the package uses cookies to deliver the modified time to the browser, only the next requests will use the changed time, the current page won't have the date modified. For logging in, this means you may need to change the time and _then_ load the login page.
 
 For example:
 
@@ -107,8 +107,8 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
-- [Taha Paksu](https://github.com/tpaksu)
-- [Shane Smith](https://github.com/shane-smith)
+- [Taha Paksu](https://github.com/tpaksu) (initial developer)
+- [Shane Smith](https://github.com/shane-smith) (current maintainer)
 - [All Contributors](../../contributors)
 
 ## License
