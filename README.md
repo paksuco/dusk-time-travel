@@ -22,7 +22,7 @@ Beyond this the package may continue to work, but is untested. Please raise an i
 You can install the package via composer:
 
 ```bash
-composer require paksuco/dusk-time-travel
+composer require --dev paksuco/dusk-time-travel ^1.0.0
 ```
 
 There is a crucial step to do after installing the package to let the browser have time travel methods, you need to extend your browser class from `Paksuco/DuskTimeTravel/Browser` class instead of the stock `Laravel/Dusk/Browser`. This class acts like a middle man between your test cases and the Laravel Dusk browser.
