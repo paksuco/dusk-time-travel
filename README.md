@@ -49,24 +49,32 @@ Since you've changed your browser class, you've gained access to two new Dusk br
 - `travelTo($time)` - travel through time, using a `Illuminate/Support/Carbon` instance as the time input.
 - `travelBack()` - return to the current time.
 
-**Note**: As the package uses cookies to deliver the modified time to the browser, only the next requests will use the changed time, the current page won't have the date modified. For logging in, this means you may need to change the time and _then_ load the login page.
+The traveled time is delivered via a cookie, which has two consequences:
+1. The browser must already be on a page of your app when you call `travelTo()` or `travelBack()`, so `visit()` something first or you'll get an `invalid cookie domain` error.
+2. The time change (both server-side and browser-side JavaScript) only applies from the **next** page load; the current page is unaffected.
 
 For example:
 
 ```php
 $this->browse(function ($browser) {
-
-    // The home page will show today's date
-    $browser->visit("home")
-        ->travelTo(Carbon::tomorrow());
+    
+    $browser->visit('/')
+        // (1) Visit home, (2) Travel to tomorrow
+        ->visit("home")
+        ->travelTo(Carbon::tomorrow())
+        // The home page will show today's date (we have NOT reloaded the page)
+        ->assertSee(Carbon::today()->format('Y-m-d'));
 });
 ```
 ```php
 $this->browse(function ($browser) {
 
-    // The home page will show tomorrow's date
-    $browser->travelTo(Carbon::tomorrow())
-        ->visit("home");
+    $browser->visit('/')
+        // (1) Travel to tomorrow, (2) Visit home
+        ->travelTo(Carbon::tomorrow())
+        ->visit("home")
+        // The home page will show tomorrow's date (we have reloaded the page)
+        ->assertSee(Carbon::tomorrow()-format('Y-m-d'));
 });
 ```
 
@@ -78,7 +86,8 @@ Other usage examples:
 $this->browse(function ($browser) {
 
     // Do something in yesterdays date and expect to see that it occurred on that date
-    $browser->travelTo(Carbon::yesterday())->visit($itemDetailsPage)
+    $browser->visit('/')
+        ->travelTo(Carbon::yesterday())->visit($itemDetailsPage)
         ->doStuffInYesterdaysDate()
         ->travelBack()->visit($itemDetailsPage)
         ->assertSee(Carbon::yesterday());
@@ -98,8 +107,36 @@ $this->browse(function ($browser) {
 
 After you've recreated the instance, or manually reset with `travelBack()`, the server will revert to the normal date.
 
+## Browser-side (JavaScript) time travel
+
+In addition to faking server-side time, `travelTo()` also fakes time for JavaScript running in the browser. `new Date()`, `Date.now()` and plain `Date()` calls in page scripts will return the traveled time. This works by registering a small `Date` shim through the Chrome DevTools Protocol (`Page.addScriptToEvaluateOnNewDocument`), so it:
+
+- takes effect on the **next page load** — consistent with when the server-side time changes,
+- survives navigations, and runs **before** any page script on every new document,
+- is removed again by `travelBack()`, also taking effect on the next page load.
+
+Note that each page load starts exactly at the traveled instant and then ticks forward naturally (time is shifted, not frozen — freezing would break polling and animation code).
+
+Since the server re-freezes to the traveled time at the start of each request, browser and server agree at page-load time and the browser then drifts forward by the age of the page.
+
+To fake only server-side time, pass `false` as the second argument:
+
+```php
+// All PHP versions:
+$browser->visit('/')->travelTo(Carbon::tomorrow(), false);
+
+// Or if you'd like to use named parameters (PHP 8.0+):
+$browser->visit('/')->travelTo(Carbon::tomorrow(), javascript: false);
+```
+
+Limitations:
+
+- Requires Chrome/Chromium (the standard Dusk setup). On other drivers, or if the DevTools command is unavailable, browser-side faking silently degrades and server-side faking continues to work as before.
+- Only the zero-argument functions are shifted. Explicit constructions like `new Date(2020, 0, 1)`, `Date.parse()` and `Date.UTC()` behave natively (as you'd expect).
+- `performance.now()` and Web Workers are not faked.
+
 ## Testing
-A test case is included, but since it's a Dusk extension, the tests are run on a Laravel instance having Dusk installed. You can test the plugin the same way the `.github/workflows/run-tests.yml` workflow does.
+A test case is included in this respository, but since it's a Dusk extension the tests are run on a Laravel instance having Dusk installed. You can test the plugin the same way the `.github/workflows/run-tests.yml` workflow does.
 
 ## Security Vulnerabilities
 
