@@ -16,8 +16,8 @@ class BrowserTimeTest extends DuskTestCase
             // travelTo() sets a cookie, which the browser only accepts while a
             // page of the app is open — a fresh session starts on about:blank,
             // so every test visits a page before its first travelTo().
-            $browser->visit('/js-time')
-                ->travelTo($target)->visit('/js-time');
+            $browser->visit('/js/time')
+                ->travelTo($target)->visit('/js/time');
 
             $this->assertCarbonWithin($target, $browser->text('#js-iso'));
 
@@ -33,8 +33,8 @@ class BrowserTimeTest extends DuskTestCase
         $target = Carbon::parse('2021-03-04 05:06:07');
 
         $this->browse(function (Browser $browser) use ($target) {
-            $browser->visit('/js-time')
-                ->travelTo($target)->visit('/js-time');
+            $browser->visit('/js/time')
+                ->travelTo($target)->visit('/js/time');
 
             $serverTime = Carbon::parse($browser->text('#server-time'));
             $this->assertCarbonWithin($serverTime, $browser->text('#js-iso'));
@@ -46,8 +46,8 @@ class BrowserTimeTest extends DuskTestCase
     public function testExplicitDateArgumentsUnaffected()
     {
         $this->browse(function (Browser $browser) {
-            $browser->visit('/js-time')
-                ->travelTo(Carbon::parse('2031-06-07 08:09:10'))->visit('/js-time');
+            $browser->visit('/js/time')
+                ->travelTo(Carbon::parse('2031-06-07 08:09:10'))->visit('/js/time');
 
             $this->assertStringContainsString('2020-01-0', $browser->text('#js-explicit'));
 
@@ -63,14 +63,14 @@ class BrowserTimeTest extends DuskTestCase
         $target = Carbon::parse('2021-03-04 05:06:07');
 
         $this->browse(function (Browser $browser) use ($target) {
-            $browser->visit('/js-time')->travelTo($target);
+            $browser->visit('/js/time')->travelTo($target);
 
             // The current page is unaffected, consistent with server-side time.
             $jsNowSeconds = (int) round(((float) $browser->script('return Date.now();')[0]) / 1000);
             $this->assertLessThan(15, abs($jsNowSeconds - Carbon::now()->getTimestamp()));
 
             // The next page load uses the traveled time.
-            $browser->visit('/js-time');
+            $browser->visit('/js/time');
             $this->assertCarbonWithin($target, $browser->text('#js-iso'));
 
             $browser->travelBack();
@@ -80,10 +80,10 @@ class BrowserTimeTest extends DuskTestCase
     public function testTravelBackRestoresBrowserTime()
     {
         $this->browse(function (Browser $browser) {
-            $browser->visit('/js-time')
-                ->travelTo(Carbon::parse('2021-03-04 05:06:07'))->visit('/js-time');
+            $browser->visit('/js/time')
+                ->travelTo(Carbon::parse('2021-03-04 05:06:07'))->visit('/js/time');
 
-            $browser->travelBack()->visit('/js-time');
+            $browser->travelBack()->visit('/js/time');
 
             $this->assertCarbonWithin(Carbon::now(), $browser->text('#js-iso'));
             $this->assertSame('undefined', $browser->script('return typeof window.__duskTimeTravel;')[0]);
@@ -93,12 +93,38 @@ class BrowserTimeTest extends DuskTestCase
     public function testDateFunctionCallReturnsString()
     {
         $this->browse(function (Browser $browser) {
-            $browser->visit('/js-time')
-                ->travelTo(Carbon::parse('2021-03-04 05:06:07'))->visit('/js-time');
+            $browser->visit('/js/time')
+                ->travelTo(Carbon::parse('2021-03-04 05:06:07'))->visit('/js/time');
 
             $this->assertStringContainsString('2021', $browser->text('#js-fn'));
 
             $browser->travelBack();
+        });
+    }
+
+    public function testApiRouteSeesRealTimeByDefault()
+    {
+        $this->browse(function (Browser $browser) {
+            $browser
+                ->visit("/api/time")
+                ->assertSee(Carbon::now()->startOfHour()->toIso8601String());
+        });
+    }
+
+    public function testApiRouteSeesTraveledTime()
+    {
+        $this->browse(function (Browser $browser) {
+            // The cookie is only accepted while a page of the app is open,
+            // so visit something first before traveling — same requirement
+            // as the "web" group.
+            $browser->visit("/api/time")
+                ->travelTo(Carbon::yesterday()->setHour(4))
+                ->visit("/api/time")
+                ->assertSee(Carbon::yesterday()->setHour(4)->startOfHour()->toIso8601String());
+
+            $browser->travelBack()
+                ->visit("/api/time")
+                ->assertSee(Carbon::now()->startOfHour()->toIso8601String());
         });
     }
 

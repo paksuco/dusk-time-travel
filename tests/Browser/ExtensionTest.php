@@ -13,7 +13,7 @@ class ExtensionTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser
-                ->visit("/time")
+                ->visit("/web/time")
                 ->screenshot("check_route")
                 ->assertSee(Carbon::now()->startOfHour()->toIso8601String());
         });
@@ -24,7 +24,7 @@ class ExtensionTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->travelTo(Carbon::yesterday()->setHour(4))
-                ->visit("/time")
+                ->visit("/web/time")
                 ->assertSee(Carbon::yesterday()->setHour(4)->startOfHour()->toIso8601String());
         });
     }
@@ -33,11 +33,11 @@ class ExtensionTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->travelTo(Carbon::yesterday()->setHour(4))
-                ->visit("/time")
+                ->visit("/web/time")
                 ->assertSee(Carbon::yesterday()->setHour(4)->startOfHour()->toIso8601String());
 
             $browser->travelBack()
-                ->visit("/time")
+                ->visit("/web/time")
                 ->assertSee(Carbon::now()->startOfHour()->toIso8601String());
         });
     }

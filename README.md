@@ -135,7 +135,36 @@ Limitations:
 - Only the zero-argument functions are shifted. Explicit constructions like `new Date(2020, 0, 1)`, `Date.parse()` and `Date.UTC()` behave natively (as you'd expect).
 - `performance.now()` and Web Workers are not faked.
 
+## Registering the `ModifyDuskBrowserTime` middleware
+
+By default, the package registers its middleware globally, so every request your application's HTTP kernel handles is covered — `web`, `api`, any custom middleware group, and even routes that don't belong to any group at all.
+
+The middleware is inert unless the browser has actually traveled through time (with `travelTo()`), so this is safe even if your application has no `api` route group, or doesn't use one at all.
+
+If you'd like more control, publish the config file:
+
+```bash
+php artisan vendor:publish --tag=dusk-time-travel-config
+```
+
+This creates `config/dusk-time-travel.php`:
+
+```php
+return [
+    'middleware' => true,
+];
+```
+
+The `middleware` option accepts:
+
+- `true` (default) — register globally, as described above.
+- `false` — don't register the middleware anywhere automatically. Use this if you'd rather wire it up yourself.
+- an array of middleware group names, e.g. `['web']` — register only on those groups instead of globally. Group names that you define but don't actually exist will be silently skipped.
+
+**Note on Laravel 7.x:** Defining an array of middleware group names is only supported on Laravel 8 onwards. If an array is defined in the config file on Laravel 7, it will instead be silently handled as if you'd set it to boolean true instead and the middleware will be registered globally.
+
 ## Testing
+
 A test case is included in this respository, but since it's a Dusk extension the tests are run on a Laravel instance having Dusk installed. You can test the plugin the same way the `.github/workflows/run-tests.yml` workflow does.
 
 ## Security Vulnerabilities

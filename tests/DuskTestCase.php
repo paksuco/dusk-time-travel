@@ -6,7 +6,6 @@ use Illuminate\Support\Carbon;
 use Orchestra\Testbench\Dusk\TestCase as BaseTestCase;
 use Paksuco\DuskTimeTravel\Browser as TimeTravelEnabledBrowser;
 use Paksuco\DuskTimeTravel\DuskTimeTravelServiceProvider;
-use Paksuco\DuskTimeTravel\Middleware\ModifyDuskBrowserTime;
 
 abstract class DuskTestCase extends BaseTestCase
 {
@@ -33,33 +32,28 @@ abstract class DuskTestCase extends BaseTestCase
 
     protected function getEnvironmentSetUp($app)
     {
-        $this->pushMiddleware();
-        $this->registerTestRoute($app);
+        $this->registerTestRoutes($app);
     }
 
-    protected function pushMiddleware()
-    {
-        $kernel = $this->getKernel();
-        $kernel->pushMiddleware(ModifyDuskBrowserTime::class);
-    }
-
-    protected function getKernel()
-    {
-        return app('Illuminate\Contracts\Http\Kernel');
-    }
-
-    protected function registerTestRoute($app)
+    protected function registerTestRoutes($app)
     {
         $router = $app["router"];
 
-        $router->get('time', [
+        $router->get('web/time', [
             'middleware' => 'web',
             'uses' => function () {
                 return Carbon::now()->startOfHour()->toIso8601String();
             },
         ]);
 
-        $router->get('js-time', [
+        $router->get('api/time', [
+            'middleware' => 'api',
+            'uses' => function () {
+                return Carbon::now()->startOfHour()->toIso8601String();
+            },
+        ]);
+
+        $router->get('js/time', [
             'middleware' => 'web',
             'uses' => function () {
                 // The inline script runs at document parse time, before any
@@ -83,5 +77,10 @@ abstract class DuskTestCase extends BaseTestCase
                 </html>';
             },
         ]);
+
+        // Deliberately declared outside any middleware group, so the
+        // default (global) registration can be told apart from a
+        // group-based one: only global reaches this route.
+        $router->get('ungrouped/time', fn () => Carbon::now()->toIso8601String());
     }
 }
