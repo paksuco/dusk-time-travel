@@ -10,12 +10,16 @@
 
 This package feeds the hunger for Dusk test cases having time modified requests. All PR's are welcome.
 
-Supported versions:
+Tested versions:
 - Laravel Dusk 6 → 8
 - Laravel Framework 7 → 13
 - PHP 7.4 → 8.6
 
-Beyond this the package may continue to work, but is untested. Please raise an issue if you run into problems, so it can be fixed.
+Only PHP versions that still receive security patches are supported. See [PHP's supported versions](https://www.php.net/supported-versions.php) for the current list.
+
+We still run the test suite against PHP versions as far back as 7.4, and the package doesn't lock them out. We don't encourage running end-of-life PHP. That coverage is there so you can keep running your browser tests while you upgrade, which you should do urgently.
+
+Beyond these versions the package may continue to work, but is untested. Please raise an issue if you run into problems, so it can be fixed.
 
 ## Installation
 
