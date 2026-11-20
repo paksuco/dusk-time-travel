@@ -13,7 +13,7 @@ This package feeds the hunger for Dusk test cases having time modified requests.
 Supported versions:
 - Laravel Dusk 6 → 8
 - Laravel Framework 7 → 13
-- PHP 7.4 → 8.5
+- PHP 7.4 → 8.6
 
 Beyond this the package may continue to work, but is untested. Please raise an issue if you run into problems, so it can be fixed.
 
