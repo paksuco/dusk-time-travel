@@ -110,3 +110,22 @@ jobs:
 
       - name: Execute Dusk Tests
         run: ./vendor/bin/phpunit
+
+      # Dusk writes screenshots, page source and browser console logs on failure,
+      # and the app under test logs server-side errors; none of that reaches the
+      # job log, so keep it as an artifact.
+      - name: Upload Dusk failure output
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dusk-failure-php-${{ matrix.php }}-job-${{ strategy.job-index }}
+          path: |
+            tests/Browser/screenshots/
+            tests/Browser/console/
+            tests/Browser/source/
+            vendor/orchestra/**/screenshots/
+            vendor/orchestra/**/console/
+            vendor/orchestra/**/source/
+            vendor/orchestra/**/storage/logs/
+          if-no-files-found: warn
+          retention-days: 7
