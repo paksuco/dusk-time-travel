@@ -13,7 +13,7 @@ This package feeds the hunger for Dusk test cases having time modified requests.
 Tested versions:
 - Laravel Dusk 6 → 8
 - Laravel Framework 7 → 13
-- PHP 7.4 → 8.6
+- PHP 7.4 → 8.6 (PHP 8.6 requires Laravel 13)
 
 Only PHP versions that still receive security patches are supported. See [PHP's supported versions](https://www.php.net/supported-versions.php) for the current list.
 
