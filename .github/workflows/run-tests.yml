@@ -1,6 +1,9 @@
 name: Tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [master]
+  pull_request:
 
 env:
   DUSK_DRIVER_MANAGEMENT: false
@@ -19,13 +22,8 @@ jobs:
 
           # Laravel version + Compatible PHP versions
           mapping = {
-            "7.*": ["7.4", "8.0"],
-            "8.*": ["7.4", "8.0.2"],
-            "9.*": ["8.0.2"],
-            "10.*": ["8.1", "8.2", "8.3", "8.4", "8.5"],
-            "11.*": ["8.2", "8.3", "8.4", "8.5"],
             "12.*": ["8.2", "8.3", "8.4", "8.5"],
-            "13.*": ["8.3", "8.4", "8.5"],
+            "13.*": ["8.3", "8.4", "8.5", "8.6"],
           }
 
           includes = []
@@ -95,6 +93,9 @@ jobs:
 
       - name: Install dependencies
         run: |
+          # Psalm runs in its own workflow and has no release installable on every
+          # PHP version in this matrix, so keep it out of the test install.
+          composer remove vimeo/psalm --dev --no-update --no-interaction
           composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
           composer require "orchestra/testbench-dusk:*" --no-interaction --no-update --dev
           composer update --prefer-stable --prefer-dist --no-interaction
@@ -102,3 +103,22 @@ jobs:
 
       - name: Execute Dusk Tests
         run: ./vendor/bin/phpunit
+
+      # Dusk writes screenshots, page source and browser console logs on failure,
+      # and the app under test logs server-side errors; none of that reaches the
+      # job log, so keep it as an artifact.
+      - name: Upload Dusk failure output
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dusk-failure-php-${{ matrix.php }}-job-${{ strategy.job-index }}
+          path: |
+            tests/Browser/screenshots/
+            tests/Browser/console/
+            tests/Browser/source/
+            vendor/orchestra/**/screenshots/
+            vendor/orchestra/**/console/
+            vendor/orchestra/**/source/
+            vendor/orchestra/**/storage/logs/
+          if-no-files-found: warn
+          retention-days: 7

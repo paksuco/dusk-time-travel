@@ -11,18 +11,22 @@
 This package feeds the hunger for Dusk test cases having time modified requests. All PR's are welcome.
 
 Supported versions:
-- Laravel Dusk 6 → 8
-- Laravel Framework 7 → 13
-- PHP 7.4 → 8.5
+- Laravel Dusk 8
+- Laravel Framework 12 → 13
+- PHP 8.2 → 8.6 (PHP 8.6 requires Laravel 13)
 
-Beyond this the package may continue to work, but is untested. Please raise an issue if you run into problems, so it can be fixed.
+Only PHP versions that still receive security patches are supported. See [PHP's supported versions](https://www.php.net/supported-versions.php) for the current list.
+
+On Laravel 7 → 11 or PHP 7.4 → 8.1? Version 1.x of this package still installs there, but it no longer receives updates. Please upgrade with urgency.
+
+Beyond these versions the package may continue to work, but is untested. Please raise an issue if you run into problems, so it can be fixed.
 
 ## Installation
 
 You can install the package via composer:
 
 ```bash
-composer require --dev paksuco/dusk-time-travel ^1.0.0
+composer require --dev paksuco/dusk-time-travel ^2.0
 ```
 
 There is a crucial step to do after installing the package to let the browser have time travel methods, you need to extend your browser class from `Paksuco/DuskTimeTravel/Browser` class instead of the stock `Laravel/Dusk/Browser`. This class acts like a middle man between your test cases and the Laravel Dusk browser.
@@ -119,13 +123,9 @@ Note that each page load starts exactly at the traveled instant and then ticks f
 
 Since the server re-freezes to the traveled time at the start of each request, browser and server agree at page-load time and the browser then drifts forward by the age of the page.
 
-To fake only server-side time, pass `false` as the second argument:
+To fake only server-side time, pass `javascript: false`:
 
 ```php
-// All PHP versions:
-$browser->visit('/')->travelTo(Carbon::tomorrow(), false);
-
-// Or if you'd like to use named parameters (PHP 8.0+):
 $browser->visit('/')->travelTo(Carbon::tomorrow(), javascript: false);
 ```
 

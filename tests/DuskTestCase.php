@@ -12,6 +12,31 @@ abstract class DuskTestCase extends BaseTestCase
     protected static $baseServeHost = 'localhost';
     protected static $baseServePort = 9516;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Workaround for orchestra/testbench-dusk on PHP 8.6+: its test server
+        // calls unserialize() on the stashed application tweak for every request,
+        // and that stash is empty unless a test registers one. Since PHP 8.6,
+        // unserialize('') emits a warning (php/php-src#23827), which Laravel turns
+        // into an exception, so every page returns a 500. Registering a no-op tweak
+        // keeps the stash non-empty. Remove once testbench-dusk guards the call.
+        if (PHP_VERSION_ID >= 80600) {
+            $this->beforeServingApplication('noopServingApplicationTweak');
+        }
+    }
+
+    /**
+     * No-op application tweak; see setUp().
+     *
+     * @internal
+     */
+    public function noopServingApplicationTweak($app, $config): void
+    {
+        //
+    }
+
     /**
      * Create a new Browser instance.
      *
