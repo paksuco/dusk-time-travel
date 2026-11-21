@@ -23,7 +23,7 @@ abstract class DuskTestCase extends BaseTestCase
         // unserialize('') emits a warning (php/php-src#23827), which Laravel turns
         // into an exception, so every page returns a 500. Registering a no-op tweak
         // keeps the stash non-empty. Remove once testbench-dusk guards the call.
-        if (PHP_VERSION_ID >= 80600 && method_exists($this, 'beforeServingApplication')) {
+        if (PHP_VERSION_ID >= 80600) {
             $this->beforeServingApplication('noopServingApplicationTweak');
         }
     }

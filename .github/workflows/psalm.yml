@@ -19,7 +19,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          php-version: '8.2'
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
           coverage: none
 
@@ -31,13 +31,7 @@ jobs:
           restore-keys: composer-${{ runner.OS }}-composer-
 
       - name: Run composer install
-        run: |
-          # Composer blocks packages with security advisories by default, which
-          # rules out the old Laravel majors this package supports. Allow them in
-          # CI only. Written directly to composer.json because the setting's name
-          # differs across Composer versions (audit.block-insecure in 2.9.x).
-          php -r '$f = "composer.json"; $j = json_decode(file_get_contents($f), true); $j["config"]["policy"]["advisories"]["block"] = false; $j["config"]["audit"]["block-insecure"] = false; file_put_contents($f, json_encode($j, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");'
-          composer install -n --prefer-dist
+        run: composer install -n --prefer-dist
 
       - name: Run psalm
         run: ./vendor/bin/psalm -c psalm.xml
